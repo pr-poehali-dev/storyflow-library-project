@@ -14,6 +14,8 @@ interface BookCardProps {
   coverUrl?: string;
   isBookmarked?: boolean;
   onToggleBookmark?: (id: string) => void;
+  onRead?: (id: string) => void;
+  onDetails?: (id: string) => void;
 }
 
 export default function BookCard({
@@ -26,6 +28,8 @@ export default function BookCard({
   coverUrl,
   isBookmarked = false,
   onToggleBookmark,
+  onRead,
+  onDetails,
 }: BookCardProps) {
   const [bookmarked, setBookmarked] = useState(isBookmarked);
 
@@ -84,11 +88,21 @@ export default function BookCard({
           </p>
 
           <div className="flex gap-2 mt-auto">
-            <Button variant="default" size="sm" className="gap-2">
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="gap-2"
+              onClick={() => onRead?.(id)}
+            >
               <Icon name="Book" size={16} />
               Читать
             </Button>
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={() => onDetails?.(id)}
+            >
               <Icon name="Info" size={16} />
               Подробнее
             </Button>

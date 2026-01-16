@@ -1,0 +1,37 @@
+{
+  "tests": [
+    {
+      "name": "Get all books",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "0": {
+          "id": "number",
+          "title": "string",
+          "author": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Create new book",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "title": "Тестовая книга",
+        "author": "Тестовый автор",
+        "genre": "Тест",
+        "year": 2024,
+        "description": "Описание тестовой книги",
+        "content": "Содержимое тестовой книги..."
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "id": "number",
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

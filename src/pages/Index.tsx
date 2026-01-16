@@ -1,96 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import SearchBar from '@/components/SearchBar';
 import BookCard from '@/components/BookCard';
 import GenreFilter from '@/components/GenreFilter';
+import AddBookDialog from '@/components/AddBookDialog';
+import BookReader from '@/components/BookReader';
+import BookDetails from '@/components/BookDetails';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 interface Book {
-  id: string;
+  id: number;
   title: string;
   author: string;
   genre: string;
   year: number;
   description: string;
-  coverUrl?: string;
-  isBookmarked?: boolean;
+  cover_url?: string;
 }
-
-const SAMPLE_BOOKS: Book[] = [
-  {
-    id: '1',
-    title: 'Мастер и Маргарита',
-    author: 'Михаил Булгаков',
-    genre: 'Классика',
-    year: 1967,
-    description: 'Роман о дьяволе, который приезжает в Москву 1930-х годов вместе со свитой. Произведение переплетает две линии повествования: московскую современность и древний Ершалаим.',
-  },
-  {
-    id: '2',
-    title: 'Преступление и наказание',
-    author: 'Фёдор Достоевский',
-    genre: 'Классика',
-    year: 1866,
-    description: 'Психологический роман о студенте Родионе Раскольникове, который решается на убийство старухи-процентщицы. История о муках совести и искуплении.',
-  },
-  {
-    id: '3',
-    title: 'Война и мир',
-    author: 'Лев Толстой',
-    genre: 'Классика',
-    year: 1869,
-    description: 'Эпопея о русском обществе в эпоху войн против Наполеона. Переплетение судеб аристократических семей на фоне исторических событий.',
-  },
-  {
-    id: '4',
-    title: '1984',
-    author: 'Джордж Оруэлл',
-    genre: 'Фантастика',
-    year: 1949,
-    description: 'Антиутопия о тоталитарном обществе будущего, где правит Большой Брат и контролируется каждый шаг граждан. Роман-предупреждение о диктатуре.',
-  },
-  {
-    id: '5',
-    title: 'Гарри Поттер и философский камень',
-    author: 'Дж. К. Роулинг',
-    genre: 'Фэнтези',
-    year: 1997,
-    description: 'Первая книга о мальчике-волшебнике, который узнаёт о своём магическом наследии и поступает в школу чародейства и волшебства Хогвартс.',
-  },
-  {
-    id: '6',
-    title: 'Убить пересмешника',
-    author: 'Харпер Ли',
-    genre: 'Драма',
-    year: 1960,
-    description: 'История о расовой несправедливости в американском городке, рассказанная глазами маленькой девочки. Классика о морали и человечности.',
-  },
-  {
-    id: '7',
-    title: 'Граф Монте-Кристо',
-    author: 'Александр Дюма',
-    genre: 'Приключения',
-    year: 1844,
-    description: 'Захватывающая история о моряке Эдмоне Дантесе, который был предан друзьями и провёл годы в тюрьме, а затем вернулся, чтобы отомстить.',
-  },
-  {
-    id: '8',
-    title: 'Анна Каренина',
-    author: 'Лев Толстой',
-    genre: 'Классика',
-    year: 1877,
-    description: 'Роман о трагической любви замужней женщины и офицера, на фоне картины русского общества второй половины XIX века.',
-  },
-];
-
-const ALL_GENRES = Array.from(new Set(SAMPLE_BOOKS.map(book => book.genre)));
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [readerBookId, setReaderBookId] = useState<string | null>(null);
+  const [detailsBookId, setDetailsBookId] = useState<string | null>(null);
+
+  const loadBooks = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/bd6a2732-86ce-4673-a032-4d305f7946ef');
+      const data = await response.json();
+      setBooks(data);
+    } catch (error) {
+      console.error('Ошибка загрузки книг:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBooks();
+  }, []);
+
+  const allGenres = Array.from(new Set(books.map(book => book.genre)));
 
   const handleToggleBookmark = (id: string) => {
     setBookmarks(prev => {
@@ -104,14 +60,23 @@ const Index = () => {
     });
   };
 
-  const filteredBooks = SAMPLE_BOOKS.filter(book => {
+  const handleReadBook = (id: string) => {
+    setReaderBookId(id);
+  };
+
+  const handleShowDetails = (id: string) => {
+    setDetailsBookId(id);
+  };
+
+  const filteredBooks = books.filter(book => {
+    const bookId = String(book.id);
     const matchesSearch = searchQuery === '' || 
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.description.toLowerCase().includes(searchQuery.toLowerCase());
+      (book.description && book.description.toLowerCase().includes(searchQuery.toLowerCase()));
     
     const matchesGenre = selectedGenre === null || book.genre === selectedGenre;
-    const matchesBookmark = activeTab !== 'bookmarks' || bookmarks.has(book.id);
+    const matchesBookmark = activeTab !== 'bookmarks' || bookmarks.has(bookId);
     
     return matchesSearch && matchesGenre && matchesBookmark;
   });
@@ -142,12 +107,20 @@ const Index = () => {
           Популярные книги
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {SAMPLE_BOOKS.slice(0, 4).map(book => (
+          {books.slice(0, 4).map(book => (
             <BookCard
               key={book.id}
-              {...book}
-              isBookmarked={bookmarks.has(book.id)}
+              id={String(book.id)}
+              title={book.title}
+              author={book.author}
+              genre={book.genre}
+              year={book.year}
+              description={book.description || ''}
+              coverUrl={book.cover_url}
+              isBookmarked={bookmarks.has(String(book.id))}
               onToggleBookmark={handleToggleBookmark}
+              onRead={handleReadBook}
+              onDetails={handleShowDetails}
             />
           ))}
         </div>
@@ -166,10 +139,15 @@ const Index = () => {
         </p>
       </div>
       
-      <SearchBar onSearch={setSearchQuery} />
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex-1 w-full">
+          <SearchBar onSearch={setSearchQuery} />
+        </div>
+        <AddBookDialog onBookAdded={loadBooks} />
+      </div>
       
       <GenreFilter
-        genres={ALL_GENRES}
+        genres={allGenres}
         selectedGenre={selectedGenre}
         onGenreSelect={setSelectedGenre}
       />
@@ -179,9 +157,17 @@ const Index = () => {
           filteredBooks.map(book => (
             <BookCard
               key={book.id}
-              {...book}
-              isBookmarked={bookmarks.has(book.id)}
+              id={String(book.id)}
+              title={book.title}
+              author={book.author}
+              genre={book.genre}
+              year={book.year}
+              description={book.description || ''}
+              coverUrl={book.cover_url}
+              isBookmarked={bookmarks.has(String(book.id))}
               onToggleBookmark={handleToggleBookmark}
+              onRead={handleReadBook}
+              onDetails={handleShowDetails}
             />
           ))
         ) : (
@@ -208,8 +194,8 @@ const Index = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {ALL_GENRES.map(genre => {
-          const genreBooks = SAMPLE_BOOKS.filter(b => b.genre === genre);
+        {allGenres.map(genre => {
+          const genreBooks = books.filter(b => b.genre === genre);
           return (
             <div
               key={genre}
@@ -248,12 +234,20 @@ const Index = () => {
 
       {bookmarks.size > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {SAMPLE_BOOKS.filter(book => bookmarks.has(book.id)).map(book => (
+          {books.filter(book => bookmarks.has(String(book.id))).map(book => (
             <BookCard
               key={book.id}
-              {...book}
+              id={String(book.id)}
+              title={book.title}
+              author={book.author}
+              genre={book.genre}
+              year={book.year}
+              description={book.description || ''}
+              coverUrl={book.cover_url}
               isBookmarked={true}
               onToggleBookmark={handleToggleBookmark}
+              onRead={handleReadBook}
+              onDetails={handleShowDetails}
             />
           ))}
         </div>
@@ -295,8 +289,30 @@ const Index = () => {
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       
       <main className="container mx-auto px-4 py-8">
-        {renderContent()}
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Icon name="Loader2" size={48} className="animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          renderContent()
+        )}
       </main>
+
+      <BookReader
+        bookId={readerBookId}
+        open={readerBookId !== null}
+        onClose={() => setReaderBookId(null)}
+      />
+
+      <BookDetails
+        bookId={detailsBookId}
+        open={detailsBookId !== null}
+        onClose={() => setDetailsBookId(null)}
+        onRead={() => {
+          setReaderBookId(detailsBookId);
+          setDetailsBookId(null);
+        }}
+      />
 
       <footer className="border-t border-border mt-16 py-8">
         <div className="container mx-auto px-4 text-center text-muted-foreground">

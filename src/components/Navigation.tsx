@@ -19,9 +19,11 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-              <Icon name="BookOpen" size={24} className="text-primary-foreground" />
-            </div>
+            <img 
+              src="https://cdn.poehali.dev/files/photo_5427358105772692414_y.jpg" 
+              alt="StoryFlow"
+              className="w-12 h-12 rounded-lg object-cover"
+            />
             <h1 className="font-serif font-bold text-2xl text-foreground">
               StoryFlow
             </h1>
