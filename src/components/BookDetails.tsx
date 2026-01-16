@@ -1,7 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
+import ReviewForm from './ReviewForm';
+import ReviewsList from './ReviewsList';
 import { useState, useEffect } from 'react';
 
 interface BookDetailsProps {
@@ -87,9 +90,17 @@ export default function BookDetails({ bookId, open, onClose, onRead }: BookDetai
               <Icon name="Book" size={18} />
               Читать книгу
             </Button>
+            <ReviewForm type="book" bookId={parseInt(bookId || '0')} />
             <Button variant="outline" onClick={onClose}>
               Закрыть
             </Button>
+          </div>
+
+          <Separator className="my-6" />
+
+          <div>
+            <h3 className="font-serif font-bold text-lg mb-4">Отзывы о книге</h3>
+            <ReviewsList type="book" bookId={parseInt(bookId || '0')} />
           </div>
         </div>
       </DialogContent>

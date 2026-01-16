@@ -1,0 +1,19 @@
+{
+  "tests": [
+    {
+      "name": "Admin login",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "login",
+        "password": "1Arbuz1"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "token": "string",
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

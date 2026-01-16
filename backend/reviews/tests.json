@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Create app review",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "type": "app",
+        "author_name": "Тестовый пользователь",
+        "rating": 5,
+        "content": "Отличное приложение!"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "id": "number",
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get approved reviews",
+      "method": "GET",
+      "path": "/?status=approved",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

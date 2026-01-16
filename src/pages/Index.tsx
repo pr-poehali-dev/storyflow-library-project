@@ -6,7 +6,10 @@ import GenreFilter from '@/components/GenreFilter';
 import AddBookDialog from '@/components/AddBookDialog';
 import BookReader from '@/components/BookReader';
 import BookDetails from '@/components/BookDetails';
+import ReviewForm from '@/components/ReviewForm';
+import ReviewsList from '@/components/ReviewsList';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 
 interface Book {
@@ -124,6 +127,18 @@ const Index = () => {
             />
           ))}
         </div>
+      </div>
+
+      <Separator className="my-8" />
+
+      <div className="max-w-3xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-serif text-2xl font-bold text-foreground">
+            Отзывы о StoryFlow
+          </h3>
+          <ReviewForm type="app" />
+        </div>
+        <ReviewsList type="app" />
       </div>
     </div>
   );
